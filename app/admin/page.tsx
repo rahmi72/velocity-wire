@@ -50,7 +50,7 @@ export default function AdminPage() {
       if (res.ok) {
         setMessage('✅ Artikel berhasil dipublish!');
         setFormData({ title: '', slug: '', excerpt: '', content: '', category: 'SPORTS', image_url: '', status: 'published' });
-        setTimeout(() => router.push('/'), 2000); // Redirect ke home setelah 2 detik
+        
       } else {
         setMessage('❌ Error: ' + result.error);
       }
