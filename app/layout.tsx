@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
-import AdSlot from '@/components/AdSlot'; // <--- TAMBAHKAN INI
+import AdSlot from '@/components/AdSlot'; 
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,9 @@ export default function RootLayout({
       <body className={`${inter.className} bg-slate-950 text-slate-300 antialiased`}>
         <AdSlot type="header" /> {/* <--- IKLAN HEADER */}
         {children}
+
+        {/* PASANG GOOGLE ANALYTICS DI SINI */}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''} />
       </body>
     </html>
   );
