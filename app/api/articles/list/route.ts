@@ -3,9 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // Menggunakan Service Role agar Admin bisa lihat semua status
 );
 
+// Ambil semua artikel (termasuk draft) khusus untuk Admin
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from('articles')
@@ -13,6 +14,5 @@ export async function GET() {
     .order('created_at', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  
-  return NextResponse.json({ articles: data });
+  return NextResponse.json(data);
 }
