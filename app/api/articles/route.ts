@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     // Setelah berhasil simpan, hapus cache halaman ini:
     revalidatePath('/');       // Cache Beranda dihapus
     revalidatePath('/search'); // Cache Halaman Pencarian dihapus
+    revalidatePath(`/category/${body.category}`);
 
     return NextResponse.json({ success: true, data });
 
