@@ -54,4 +54,38 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
+} // <-- PERHATIKAN: Kurung penutup PUT ada di sini
+
+// 3. HAPUS ARTIKEL
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  
+  try {
+    // Ambil data artikel dulu untuk mengetahui slug & kategori (untuk cache)
+    const { data: articleToDelete } = await supabaseAdmin
+      .from('articles')
+      .select('slug, category')
+      .eq('id', id)
+      .single();
+
+    // Proses hapus dari database
+    const { error } = await supabaseAdmin
+      .from('articles')
+      .delete()
+      .eq('id', id);
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Hapus cache halaman terkait
+    revalidatePath('/');
+    revalidatePath('/search');
+    if (articleToDelete) {
+      revalidatePath(`/article/${articleToDelete.slug}`);
+      revalidatePath(`/category/${articleToDelete.category}`);
+    }
+
+    return NextResponse.json({ success: true, message: 'Article deleted' });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+} // <-- Kurung penutup DELETE ada di sini

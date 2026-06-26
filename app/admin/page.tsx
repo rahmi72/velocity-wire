@@ -27,17 +27,14 @@ export default function AdminPage() {
 
   // Ambil Daftar Artikel Saat Halaman Dibuka
   useEffect(() => {
-    fetch('/api/articles/list') // Kita gunakan endpoint list yang sudah ada (atau buat jika belum ada, tapi Next.js akan fallback ke halaman utama jika tidak ada)
+    fetch('/api/articles/list')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setArticles(data);
         else if (data.data) setArticles(data.data);
       })
-      .catch(() => {
-        // Fallback jika error: ambil dari API publik
-        fetch('/api/settings').catch(()=>{}); // dummy
-      });
-  }, [message]); // Refresh list setiap kali ada pesan sukses
+      .catch(() => {});
+  }, [message]);
 
   // Fungsi Auto Slug
   const handleTitleChange = (e: any) => {
@@ -87,7 +84,26 @@ export default function AdminPage() {
     setMessage('');
   };
 
-  // Fungsi Submit (Buat Baru / Update)
+  // Fungsi Hapus Artikel
+  const handleDelete = async (id: string, title: string) => {
+    const confirmDelete = window.confirm(`⚠️ Are you sure you want to permanently delete:\n\n"${title}"?\n\nThis action cannot be undone.`);
+    if (!confirmDelete) return; 
+
+    try {
+      const res = await fetch(`/api/articles/${id}`, { method: 'DELETE' });
+
+      if (res.ok) {
+        setMessage(`🗑️ Article "${title}" has been deleted.`);
+        setArticles(articles.filter(a => a.id !== id));
+      } else {
+        setMessage('❌ Failed to delete article.');
+      }
+    } catch (error) {
+      setMessage('❌ Terjadi kesalahan koneksi.');
+    }
+  };
+
+  // Fungsi Submit (Buat Baru / Update) -- YANG INI HANYA SATU
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
@@ -107,8 +123,6 @@ export default function AdminPage() {
 
       if (res.ok) {
         setMessage(`✅ Artikel berhasil ${isEditing ? 'diupdate' : 'dipublish'}!`);
-        
-        // Reset form jika buat baru, atau tetap di mode edit jika update
         if (!isEditing) {
           setFormData({ title: '', slug: '', excerpt: '', content: '', category: 'SPORTS', image_url: '', status: 'published' });
         }
@@ -136,7 +150,7 @@ export default function AdminPage() {
         </div>
 
         {message && (
-          <div className={`p-4 mb-6 rounded flex justify-between items-center ${message.includes('✅') ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
+          <div className={`p-4 mb-6 rounded flex justify-between items-center ${message.includes('✅') || message.includes('🗑️') ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
             <span>{message}</span>
             {isEditing && <button onClick={handleCancelEdit} className="underline text-sm font-bold">Batal Edit</button>}
           </div>
@@ -155,12 +169,20 @@ export default function AdminPage() {
                     <p className="text-white font-medium truncate">{article.title}</p>
                     <p className="text-xs text-slate-500">{article.category} • {article.status}</p>
                   </div>
-                  <button 
-                    onClick={() => handleEdit(article.id)}
-                    className="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1 rounded font-bold"
-                  >
-                    EDIT
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleEdit(article.id)}
+                      className="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1 rounded font-bold"
+                    >
+                      EDIT
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(article.id, article.title)}
+                      className="text-xs bg-red-700 hover:bg-red-600 text-white px-3 py-1 rounded font-bold"
+                    >
+                      DELETE
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
