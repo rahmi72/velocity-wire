@@ -30,6 +30,8 @@ export async function POST(request: Request) {
         header_ad_script: body.header_ad_script,
         sidebar_ad_script: body.sidebar_ad_script,
         in_content_ad_script: body.in_content_ad_script,
+        native_ad_script: body.native_ad_script,
+        popunder_ad_script: body.popunder_ad_script,
         updated_at: new Date().toISOString(),
       })
       .eq('id', 1); // Kita update row ID 1 yang kita buat tadi

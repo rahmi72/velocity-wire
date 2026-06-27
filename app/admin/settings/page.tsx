@@ -9,11 +9,13 @@ export default function SettingsPage() {
   const [fetching, setFetching] = useState(true);
   const [message, setMessage] = useState('');
 
-  // State untuk menyimpan script
+  // State untuk menyimpan script (Sudah ditambah Native & Popunder)
   const [scripts, setScripts] = useState({
     header_ad_script: '',
     sidebar_ad_script: '',
-    in_content_ad_script: ''
+    in_content_ad_script: '',
+    native_ad_script: '',
+    popunder_ad_script: ''
   });
 
   // Ambil data script yang sudah ada saat halaman dibuka
@@ -95,6 +97,20 @@ export default function SettingsPage() {
               />
             </div>
 
+            {/* NATIVE AD */}
+            <div className="bg-slate-900 p-6 rounded-lg border border-slate-800">
+              <h2 className="text-xl font-bold text-white mb-2">Native Ad (In-feed)</h2>
+              <p className="text-sm text-slate-500 mb-4">Iklan yang muncul seperti berita di bawah Header.</p>
+              <textarea
+                name="native_ad_script"
+                value={scripts.native_ad_script}
+                onChange={handleChange}
+                rows={4}
+                className="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white font-mono text-xs focus:border-cyan-500 outline-none"
+                placeholder="<script>...</script>"
+              />
+            </div>
+
             {/* SIDEBAR AD */}
             <div className="bg-slate-900 p-6 rounded-lg border border-slate-800">
               <h2 className="text-xl font-bold text-white mb-2">Sidebar / Sticky Ad</h2>
@@ -116,6 +132,20 @@ export default function SettingsPage() {
               <textarea
                 name="in_content_ad_script"
                 value={scripts.in_content_ad_script}
+                onChange={handleChange}
+                rows={4}
+                className="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white font-mono text-xs focus:border-cyan-500 outline-none"
+                placeholder="<script>...</script>"
+              />
+            </div>
+
+            {/* POPUNDER AD */}
+            <div className="bg-slate-900 p-6 rounded-lg border border-slate-800">
+              <h2 className="text-xl font-bold text-white mb-2">Popunder / Script Global</h2>
+              <p className="text-sm text-slate-500 mb-4">Script iklan yang muncul saat pengunjung klik (Popunder, Social Bar).</p>
+              <textarea
+                name="popunder_ad_script"
+                value={scripts.popunder_ad_script}
                 onChange={handleChange}
                 rows={4}
                 className="w-full bg-slate-950 border border-slate-700 rounded p-3 text-white font-mono text-xs focus:border-cyan-500 outline-none"

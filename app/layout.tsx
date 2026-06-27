@@ -20,7 +20,10 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-slate-950 text-slate-300 antialiased`}>
         <AdSlot type="header" /> {/* <--- IKLAN HEADER */}
+        <AdSlot type="native" />
         {children}
+
+        <AdSlot type="popunder" />
 
         {/* PASANG GOOGLE ANALYTICS DI SINI */}
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''} />
