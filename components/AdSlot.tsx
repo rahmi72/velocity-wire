@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 
 export default function AdSlot({ type }: { type: 'header' | 'sidebar' | 'in-content' }) {
-  const [adHtml, setAdHtml] = useState('');
+  const [adScript, setAdScript] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 1. Ambil script dari DB
+  // 1. Ambil script mentah dari Database
   useEffect(() => {
     fetch('/api/settings')
       .then((res) => res.json())
@@ -15,65 +15,43 @@ export default function AdSlot({ type }: { type: 'header' | 'sidebar' | 'in-cont
         if (type === 'header') content = data.header_ad_script || '';
         if (type === 'sidebar') content = data.sidebar_ad_script || '';
         if (type === 'in-content') content = data.in_content_ad_script || '';
-        setAdHtml(content);
+        setAdScript(content);
       });
   }, [type]);
 
-  // 2. Force Execution Script Secara Berurutan (PENTING UNTUK ADSTERRA)
+  // 2. PARSER KHUSUS ADSTERRA (Vanilla JS Injection)
   useEffect(() => {
-    if (!adHtml || !containerRef.current) return;
+    if (!adScript || !containerRef.current) return;
 
-    // Bersihkan container dulu sebelum menyuntikkan ulang
+    // Bersihkan dulu
     containerRef.current.innerHTML = '';
 
-    // Gunakan DOMParser untuk memecah HTML yang datang dari database
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(adHtml, 'text/html');
+    // Cari kode 'key' menggunakan Regex
+    const keyMatch = adScript.match(/'key'\s*:\s*'([^']+)'/);
 
-    // Langkah A: Masukkan elemen HTML biasa (div, gambar, dll) terlebih dahulu
-    const nonScripts = doc.body.querySelectorAll(':not(script)');
-    nonScripts.forEach(el => {
-      containerRef.current?.appendChild(el.cloneNode(true));
-    });
+    if (keyMatch) {
+      const adKey = keyMatch[1];
 
-    // Langkah B: Eksekusi script SATU PER SATU secara BERURUTAN
-    const scripts = doc.body.querySelectorAll('script');
-    
-    const executeScript = (index: number) => {
-      // Berhenti jika sudah tidak ada script lagi
-      if (index >= scripts.length) return;
+      // Langkah 1: Buat variabel atOptions secara manual di window
+      (window as any).atOptions = {
+        'key': adKey,
+        'format': 'iframe',
+        'height': 250,
+        'width': 300,
+        'params': {}
+      };
 
-      const oldScript = scripts[index];
-      const newScript = document.createElement('script');
+      // Langkah 2: Buat elemen script invoke.js secara murni
+      const script = document.createElement('script');
+      script.src = `https://www.highperformanceformat.com/${adKey}/invoke.js`;
+      script.async = true;
 
-      // Salin semua atribut (src, type, dll)
-      Array.from(oldScript.attributes).forEach(attr => {
-        newScript.setAttribute(attr.name, attr.value);
-      });
+      // Langkah 3: Suntikkan langsung ke DOM (Di luar kendali React)
+      containerRef.current.appendChild(script);
+    }
+  }, [adScript]);
 
-      // Salin isi script inline (kode atOptions = {...})
-      newScript.textContent = oldScript.textContent;
-
-      // Jika ini script eksternal (invoke.js), tunggu sampai selesai load,
-      // BARU lanjut ke script berikutnya (agar variabel atOptions sudah terbaca)
-      if (oldScript.src) {
-        newScript.onload = () => executeScript(index + 1);
-        newScript.onerror = () => executeScript(index + 1);
-      } else {
-        // Jika script inline, langsung lanjut ke berikutnya
-        executeScript(index + 1);
-      }
-
-      // Masukkan script baru yang sudah siap ke halaman
-      containerRef.current?.appendChild(newScript);
-    };
-
-    // Mulai eksekusi dari script pertama
-    executeScript(0);
-
-  }, [adHtml]);
-
-  if (!adHtml) return null;
+  if (!adScript) return null;
 
   return (
     <div
