@@ -1,5 +1,6 @@
 import NewsCard from '@/components/NewsCard';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 import supabase from '@/lib/supabaseClient';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -25,6 +26,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-200 pt-24 pb-12">
+      <Navbar />
       <div className="container mx-auto px-4">
         
         {/* HEADER PENCARIAN */}

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import AdSlot from '@/components/AdSlot';
@@ -54,7 +55,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-200 pb-12">
-      
+      <Navbar />
       {/* HEADER GAMBAR BESAR */}
       <div className="relative w-full h-[400px] md:h-[500px]">
         <img 
