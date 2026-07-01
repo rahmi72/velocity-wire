@@ -18,9 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <meta name="google-site-verification" content="9nc8-Sc-ExxEnYyIK_PyqxcdfrbvVqDtaEvC9M3p85o" />
+            <AdSlot type="header" /> {/* <--- IKLAN HEADER */}
+            <AdSlot type="native" />
+      </head>
       <body className={`${inter.className} bg-slate-950 text-slate-300 antialiased`}>
-        <AdSlot type="header" /> {/* <--- IKLAN HEADER */}
-        <AdSlot type="native" />
         {children}
 
         <AdSlot type="popunder" />
