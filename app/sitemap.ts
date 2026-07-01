@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 2. Ambil semua artikel yang statusnya published
   const { data: articles } = await supabase
     .from('articles')
-    .select('slug, updated_at')
+    .select('slug, updated_at, created_at')
     .eq('status', 'published');
 
   // 3. Format URL artikel untuk sitemap
